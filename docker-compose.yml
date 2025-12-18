@@ -1,0 +1,14 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cabinas_uji:latest
+    container_name: cabinas_uji
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data # Persist cache
+    restart: always
+    environment:
+      - NODE_ENV=production
