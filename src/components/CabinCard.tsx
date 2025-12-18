@@ -29,8 +29,8 @@ export default function CabinCard({ id, floor, link, selectedDate, startTime, en
 
         const fetchStatus = async () => {
             try {
-                // Determine date string YYYY-MM-DD
-                const dateStr = selectedDate ? selectedDate.toISOString().split('T')[0] : '';
+                // Determine date string YYYY-MM-DD using LOCAL time, not UTC
+                const dateStr = selectedDate ? `${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, '0')}-${String(selectedDate.getDate()).padStart(2, '0')}` : '';
 
                 const params = new URLSearchParams({
                     url: link,
