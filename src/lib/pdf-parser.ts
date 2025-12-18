@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+import { getFile } from './storage';
 import pdf from 'pdf-parse/lib/pdf-parse.js';
 
 export interface Cabin {
@@ -9,8 +8,11 @@ export interface Cabin {
 }
 
 export async function parseCabins(): Promise<Cabin[]> {
-    const filePath = path.join(process.cwd(), 'data/ejemplo.pdf');
-    const dataBuffer = fs.readFileSync(filePath);
+    const dataBuffer = await getFile('ejemplo.pdf');
+    if (!dataBuffer) {
+        console.error('PDF file not found');
+        return [];
+    }
 
     interface PDFLink {
         url: string;

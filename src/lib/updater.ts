@@ -1,8 +1,7 @@
-import fs from 'fs';
-import path from 'path';
+import { saveFile } from './storage';
 
 const PDF_URL = 'https://ujiapps.uji.es/ade/rest/storage/CESMFUJWTJAW7PKPZFYO1YNFADALR2UK';
-const LOCAL_PATH = path.join(process.cwd(), 'data/ejemplo.pdf');
+const PDF_FILENAME = 'ejemplo.pdf';
 
 async function downloadPdf() {
     console.log('[Updater] Starting PDF download...');
@@ -13,13 +12,7 @@ async function downloadPdf() {
         const arrayBuffer = await response.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
 
-        // Ensure directory exists
-        const dir = path.dirname(LOCAL_PATH);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
-        }
-
-        fs.writeFileSync(LOCAL_PATH, buffer);
+        await saveFile(PDF_FILENAME, buffer);
         console.log(`[Updater] PDF updated successfully at ${new Date().toISOString()}`);
     } catch (error) {
         console.error('[Updater] Error downloading PDF:', error);
