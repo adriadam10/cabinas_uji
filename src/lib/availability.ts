@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer';
 import { checkCachedOccupancy, updateOccupiedCache } from './availability-cache';
+import { browserService } from './browser-service';
 
 interface AvailabilitySlot {
     start: string;
@@ -76,19 +77,11 @@ export async function checkAvailability(originalUrl: string, dateStr?: string, r
     }
 
     let browser;
+    let page;
     try {
-        browser = await puppeteer.launch({
-            headless: true,
-            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage', // Critical for Docker
-                '--window-size=1280,1024'
-            ]
-        });
+        browser = await browserService.getBrowser();
 
-        const page = await browser.newPage();
+        page = await browser.newPage();
         await page.setViewport({ width: 1280, height: 1024 });
 
         await page.setRequestInterception(true);
@@ -285,6 +278,7 @@ export async function checkAvailability(originalUrl: string, dateStr?: string, r
         console.error("Puppeteer error", e);
         return { status: 'Error', slots: [] };
     } finally {
-        if (browser) await browser.close();
+        if (page) await page.close().catch(e => console.error("Error closing page", e));
+        // We do NOT close the browser here, as it is shared
     }
 }
