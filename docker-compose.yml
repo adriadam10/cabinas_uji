@@ -1,10 +1,7 @@
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: cabinas_uji:latest
-    container_name: cabinas_uji
+  cabinas-uji:
+    image: ghcr.io/adriadam10/cabinas-uji:latest
+    container_name: cabinas-uji
     ports:
       - "3000:3000"
     volumes:
