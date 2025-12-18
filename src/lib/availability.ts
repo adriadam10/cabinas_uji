@@ -79,7 +79,13 @@ export async function checkAvailability(originalUrl: string, dateStr?: string, r
     try {
         browser = await puppeteer.launch({
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--window-size=1280,1024']
+            executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage', // Critical for Docker
+                '--window-size=1280,1024'
+            ]
         });
 
         const page = await browser.newPage();

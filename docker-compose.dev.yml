@@ -1,0 +1,13 @@
+services:
+  cabinas-uji-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cabinas-uji-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=development
+    restart: always
