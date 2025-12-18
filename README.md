@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cabinas UJI
 
-## Getting Started
+## ¿Qué es esto?
+Este programa sirve para ver **rápidamente** la disponibilidad de las cabinas de estudio de la Biblioteca de la UJI.
 
-First, run the development server:
+En lugar de tener que entrar enlace por enlace en la web oficial para comprobar si una cabina está libre, esta aplicación te muestra un mapa visual de todas las cabinas (por plantas) indicando cuáles están disponibles en este momento. Es una herramienta pensada para ahorrar tiempo a los estudiantes que buscan sitio para estudiar.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Ejecución Técnica
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### En Local (Recomendado)
+Para ejecutar este proyecto en tu ordenador necesitas tener instalado [Node.js](https://nodejs.org/).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Instalar dependencias**:
+   Abre una terminal en la carpeta del proyecto y ejecuta:
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Iniciar el servidor de desarrollo**:
+   ```bash
+   npm run dev
+   ```
 
-## Learn More
+3. **Ver la aplicación**:
+   Abre tu navegador y entra en [http://localhost:3000](http://localhost:3000).
 
-To learn more about Next.js, take a look at the following resources:
+### Docker (Experimental)
+El proyecto incluye configuración para Docker, pero **actualmente no funciona correctamente**.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+> ⚠️ **Aviso Importante**: La imagen de Docker tiene problemas de estabilidad debido a **Puppeteer** (la herramienta que simula el navegador para obtener los datos). Al ejecutarlo en un contenedor, Puppeteer no consigue renderizar correctamente la página web de la biblioteca (que usa tecnología GWT antigua), lo que provoca que las cabinas aparezcan incorrectamente como "Disponibles" o que el servicio se bloquee.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Si aun así quieres probarlo:
 
-## Deploy on Vercel
+1. **Construir la imagen**:
+   ```bash
+   docker compose build
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. **Arrancar el contenedor**:
+   ```bash
+   docker compose up
+   ```
