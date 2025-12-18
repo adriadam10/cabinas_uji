@@ -25,13 +25,22 @@ function checkOverlap(start1: number, end1: number, start2: number, end2: number
 
 function parseMonthYear(text: string): { month: number, year: number } {
     const parts = text.split(' ');
-    // e.g. "Dec 2025"
+    // e.g. "Dec 2025" or "Dic 2025"
     if (parts.length < 2) return { month: -1, year: -1 };
 
-    // Month name to index
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const month = months.findIndex(m => parts[0].startsWith(m));
-    const year = parseInt(parts[1]);
+    // Month name to index - Support English and Spanish
+    // Order matters for index
+    const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthsEs = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    const mStr = parts[0];
+    let month = monthsEn.findIndex(m => mStr.startsWith(m));
+    if (month === -1) {
+        month = monthsEs.findIndex(m => mStr.startsWith(m));
+    }
+
+    // Parse year from the last part usually
+    const year = parseInt(parts[parts.length - 1]);
 
     return { month, year };
 }
@@ -187,13 +196,15 @@ export async function checkAvailability(originalUrl: string, dateStr?: string, r
                         const targetD = new Date(dateStr).getDate();
 
                         for (const cell of dayCells) {
-                            const text = (cell as HTMLElement).innerText; // "Thu, Dec 18"
-                            // extracting day number
-                            // split by space, last part
-                            const parts = text.split(' ');
-                            const num = parseInt(parts[parts.length - 1]);
-                            if (num === targetD) {
-                                return (cell as HTMLElement).style.left;
+                            const text = (cell as HTMLElement).innerText; // e.g. "Thu, Dec 18" or "18 Dec"
+
+                            // Robustly find number
+                            const match = text.match(/(\d+)/);
+                            if (match) {
+                                const num = parseInt(match[1]);
+                                if (num === targetD) {
+                                    return (cell as HTMLElement).style.left;
+                                }
                             }
                         }
                         return '';
