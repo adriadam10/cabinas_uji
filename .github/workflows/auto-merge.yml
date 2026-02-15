@@ -1,0 +1,58 @@
+name: Auto-merge Dependabot PRs
+
+on:
+  workflow_run:
+    workflows: [Test]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.actor == 'dependabot[bot]'
+
+    steps:
+      - name: Get PR number
+        id: pr
+        run: |
+          # Query PRs from the repo that have the HEAD SHA from the successful workflow run
+          # and are open.
+          PR_NUMBER=$(gh api repos/${{ github.repository }}/pulls \
+            --jq '.[] | select(.head.sha == "${{ github.event.workflow_run.head_sha }}") | .number')
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR found for SHA ${{ github.event.workflow_run.head_sha }}"
+            exit 0
+          fi
+          
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          PR_URL="https://github.com/${{ github.repository }}/pull/$PR_NUMBER"
+          echo "url=$PR_URL" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch Dependabot metadata
+        if: steps.pr.outputs.number != ''
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-approve patch and minor updates
+        if: steps.pr.outputs.number != '' && steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr review --approve "${{ steps.pr.outputs.url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-merge patch and minor updates
+        if: steps.pr.outputs.number != '' && steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.url }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
