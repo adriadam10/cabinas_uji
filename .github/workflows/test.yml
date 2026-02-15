@@ -40,8 +40,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Test
+        run: npm test
 
       # Build acts as a comprehensive check (types + build validity)
       - name: Build
