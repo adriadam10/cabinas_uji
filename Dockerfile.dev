@@ -1,0 +1,29 @@
+FROM node:20-alpine
+
+# Installs latest Chromium (100) package.
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
+
+# Tell Puppeteer to skip installing Chrome. We'll be using the installed package.
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+WORKDIR /app
+
+# Install dependencies based on the preferred package manager
+COPY package.json package-lock.json* ./
+RUN npm ci
+
+# Copy the rest of the code
+COPY . .
+
+# Expose the port
+EXPOSE 3000
+
+# Run the development server
+CMD ["npm", "run", "dev"]
